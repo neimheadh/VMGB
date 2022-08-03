@@ -41,10 +41,10 @@ void Midi::end()
     }
 }
 
-void Midi::event(struct MidiEvent event)
+void Midi::followEvent(struct MidiEvent event)
 {
     for(auto it = std::begin(_handlers); it != std::end(_handlers); ++it) {
-        (it->handler)(event, it->args);
+        it->handler(event, it->args);
     }
 }
 
@@ -55,6 +55,17 @@ void Midi::onMidiEvent(midi_handler_t handler, void *args...)
         .args = args
     };
     _handlers.push_back(midi_handler);
+}
+
+void Midi::noteOff(unsigned char note, unsigned char channel)
+{
+    _driver->noteOff(note, channel);
+}
+
+
+void Midi::noteOn(unsigned char note, unsigned char channel)
+{
+    _driver->noteOn(note, channel);
 }
 
 void Midi::_process()

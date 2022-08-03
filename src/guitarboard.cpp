@@ -183,6 +183,13 @@ QFrame *GuitarBoard::stringFrame()
     return this->findChild<QFrame *>("string");
 }
 
+void GuitarBoard::onNoteChange(note_handler_t handler, void *args...)
+{
+    for (unsigned char i = 0; i < _strings; i++) {
+        string(i)->onNoteChange(handler, args);
+    }
+}
+
 GuitarBoard *GuitarBoard::_build()
 {
     GuitarString *guitarstring = nullptr;

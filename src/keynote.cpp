@@ -36,8 +36,6 @@ KeyNote::~KeyNote()
 
 KeyNote *KeyNote::play()
 {
-    std::cout << QString::number(_note).toStdString() << ": " << KeyNote::MIDI_MAP[_note] << std::endl;
-
     button()->setDown(true);
 
     return this;
@@ -65,6 +63,15 @@ QPushButton *KeyNote::button()
     return this->findChild<QPushButton *>("button");
 }
 
+void KeyNote::onNoteChange(note_handler_t handler, void *args...)
+{
+    _note_handlers.push_back({
+                                 .handler = handler,
+                                 .args = args
+                             });
+}
+
+
 unsigned char KeyNote::note()
 {
     return _note;
@@ -72,12 +79,21 @@ unsigned char KeyNote::note()
 
 void KeyNote::on_button_pressed()
 {
+    _noteEvent({.note = _note, .released = false});
     play();
 }
 
 
 void KeyNote::on_button_released()
 {
+    _noteEvent({.note = _note, .released = true});
     release();
+}
+
+void KeyNote::_noteEvent(struct NoteChangeEvent event)
+{
+    for (auto it = std::begin(_note_handlers); it != std::end(_note_handlers); ++it) {
+        it->handler(event, it->args);
+    }
 }
 

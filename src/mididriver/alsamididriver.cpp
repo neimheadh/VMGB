@@ -1,5 +1,6 @@
 #include "mididriver/alsamididriver.h"
 
+#include <iostream>
 #include <string.h>
 #include "midi.h"
 
@@ -55,6 +56,46 @@ void AlsaMidiDriver::init()
     }
 }
 
+void AlsaMidiDriver::noteOff(unsigned char note, unsigned char channel)
+{
+    if (_handle != nullptr) {
+        snd_seq_event_t ev;
+
+        snd_seq_ev_set_noteoff(&ev, channel, note, 127);
+        snd_seq_ev_set_direct(&ev);
+        snd_seq_ev_set_subs(&ev);
+        snd_seq_ev_set_source(&ev, _out_port);
+
+        int err = snd_seq_event_output_direct(_handle, &ev);
+
+        if (err < 0) {
+            char errBuff[255];
+            sprintf(errBuff, "MIDI ERROR (%d): %s", err, snd_strerror(err));
+            std::cout << errBuff << std::endl;
+        }
+    }
+}
+
+void AlsaMidiDriver::noteOn(unsigned char note, unsigned char channel)
+{
+    if (_handle != nullptr) {
+        snd_seq_event_t ev;
+
+        snd_seq_ev_set_noteon(&ev, channel, note, 127);
+        snd_seq_ev_set_direct(&ev);
+        snd_seq_ev_set_subs(&ev);
+        snd_seq_ev_set_source(&ev, _out_port);
+
+        int err = snd_seq_event_output_direct(_handle, &ev);
+
+        if (err < 0) {
+            char errBuff[255];
+            sprintf(errBuff, "MIDI ERROR (%d): %s", err, snd_strerror(err));
+            std::cout << errBuff << std::endl;
+        }
+    }
+}
+
 void AlsaMidiDriver::process()
 {
     snd_seq_event_t *ev;
@@ -65,21 +106,22 @@ void AlsaMidiDriver::process()
             case SND_SEQ_EVENT_CONTROLLER:
                 break;
             case SND_SEQ_EVENT_NOTEOFF:
-                _manager->event({
+                _manager->followEvent({
                                     .type = MidiEventType::NOTE_OFF,
                                     .channel = ev->data.note.channel,
                                     .value = ev->data.note.note
                                 });
                 break;
             case SND_SEQ_EVENT_NOTEON:
-                _manager->event({
+                _manager->followEvent({
                                     .type = MidiEventType::NOTE_ON,
                                     .channel = ev->data.note.channel,
                                     .value = ev->data.note.note
-                            });
+                                });
                 break;
             case SND_SEQ_EVENT_PITCHBEND:
                 break;
         }
+        snd_seq_free_event(ev);
     } while(snd_seq_event_input_pending(_handle, 0));
 }

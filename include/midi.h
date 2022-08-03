@@ -37,16 +37,28 @@ class Midi
         void end();
 
         /**
-         * @brief Send a midi event.
+         * @brief Follow a midi event.
          * @param event The event.
          */
-        void event(struct MidiEvent event);
-
+        void followEvent(struct MidiEvent event);
         /**
          * @brief Subscribe a new midi handler.
          * @param handler The handler.
          */
         void onMidiEvent(midi_handler_t handler, void *args...);
+
+        /**
+         * @brief Send a note off signal to the MIDI sequencer.
+         * @param note    The MIDI note.
+         * @param channel The channel.
+         */
+        void noteOff(unsigned char note, unsigned char channel = 0);
+        /**
+         * @brief Send a note on signal to the MIDI sequencer.
+         * @param note    The MIDI note.
+         * @param channel The channel.
+         */
+        void noteOn(unsigned char note, unsigned char channel = 0);
 
     private:
         struct _midi_handler_v {

@@ -137,6 +137,13 @@ public:
      */
     QFrame *stringFrame();
 
+    /**
+     * @brief Add note change handler.
+     * @param handler The handler.
+     * @param args Handler additionnal args.
+     */
+    void onNoteChange(note_handler_t handler, void *args...);
+
 private:
     /**
      * @brief The guitar board ui.

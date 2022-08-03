@@ -3,10 +3,12 @@
 
 #include <QWidget>
 #include <QLabel>
+#include <vector>
 
 #include "keynote.h"
 
 namespace Ui { class GuitarString; }
+
 
 /**
  * @brief A guitar string
@@ -83,11 +85,14 @@ public:
      */
     QLabel *label();
 
-private:
     /**
-     * @brief Guitar string ui.
+     * @brief Add note change handler.
+     * @param handler The handler.
+     * @param args Handler additionnal args.
      */
-    Ui::GuitarString* _ui;
+    void onNoteChange(note_handler_t handler, void *args...);
+
+private:
     /**
      * @brief Guitar board fret count.
      */
@@ -100,6 +105,10 @@ private:
      * @brief The playing fret. -1 if none.
      */
     int _playing = -1;
+    /**
+     * @brief Guitar string ui.
+     */
+    Ui::GuitarString* _ui;
 
     /**
      * @brief Build the guitar string ui.

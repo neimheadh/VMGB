@@ -20,6 +20,15 @@ void on_midi_event(struct MidiEvent event, MainWindow *w)
     }
 }
 
+void on_note_event(struct NoteChangeEvent event, Midi *mid)
+{
+    if (event.released) {
+        mid->noteOff(event.note);
+    } else {
+        mid->noteOn(event.note);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -39,6 +48,8 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     mid.onMidiEvent((midi_handler_t) &on_midi_event, &w);
+    w.guitarboard()->onNoteChange((note_handler_t) &on_note_event, &mid);
+
     mid.start();
     w.show();
     int errcode = a.exec();

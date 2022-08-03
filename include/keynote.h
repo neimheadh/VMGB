@@ -5,6 +5,13 @@
 #include <QWidget>
 #include <QPushButton>
 
+struct NoteChangeEvent {
+    unsigned char note;
+    bool released;
+};
+
+typedef void (*note_handler_t)(struct NoteChangeEvent, ...);
+
 namespace Ui {
 class KeyNote;
 }
@@ -62,6 +69,13 @@ public:
      */
     QPushButton *button();
 
+    /**
+     * @brief Add note change handler.
+     * @param handler The handler.
+     * @param args Handler additionnal args.
+     */
+    void onNoteChange(note_handler_t handler, void *args...);
+
 private slots:
 
     void on_button_pressed();
@@ -69,14 +83,29 @@ private slots:
     void on_button_released();
 
 private:
-    /**
-     * @brief The note UI.
-     */
-    Ui::KeyNote *_ui;
+    struct _note_handler_v {
+        note_handler_t handler;
+        void *args;
+    };
+
     /**
      * @brief The MIDI note.
      */
     unsigned char _note;
+    /**
+     * @brief Subscribed note-press handlers.
+     */
+    std::vector<struct _note_handler_v> _note_handlers;
+    /**
+     * @brief The note UI.
+     */
+    Ui::KeyNote *_ui;
+
+    /**
+     * @brief Throw a note change event.
+     * @param event The event.
+     */
+    void _noteEvent(struct NoteChangeEvent event);
 };
 
 #endif // NOTE_H

@@ -72,11 +72,6 @@ GuitarString *GuitarString::release()
     return this;
 }
 
-QLabel *GuitarString::label()
-{
-    return this->findChild<QLabel *>("label");
-}
-
 KeyNote *GuitarString::key(unsigned char key)
 {
     return this->findChild<KeyNote *>(QString::number(key));
@@ -85,6 +80,17 @@ KeyNote *GuitarString::key(unsigned char key)
 KeyNote *GuitarString::key(QString key)
 {
     return this->findChild<KeyNote *>(key);
+}
+
+QLabel *GuitarString::label()
+{
+    return this->findChild<QLabel *>("label");
+}
+
+void GuitarString::onNoteChange(note_handler_t handler, void *args...)
+{
+    for (unsigned char i = 0; i < _frets; i++)
+        key(i)->onNoteChange(handler, args);
 }
 
 GuitarString *GuitarString::_build()

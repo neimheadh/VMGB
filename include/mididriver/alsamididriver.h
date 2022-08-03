@@ -25,6 +25,14 @@ public:
     /**
      * @inherits
      */
+    void noteOff(unsigned char note, unsigned char channel);
+    /**
+     * @inherits
+     */
+    void noteOn(unsigned char note, unsigned char channel);
+    /**
+     * @inherits
+     */
     void process();
 
 private:
