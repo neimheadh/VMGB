@@ -1,8 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <iostream>
 #include <QAction>
+#include <iostream>
+#include "settingwindow.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -11,30 +12,51 @@ MainWindow::MainWindow(QWidget *parent)
 {
     _ui->setupUi(this);
 
-    connect(this->findChild<QAction *>("actionTest"), &QAction::triggered, this, &MainWindow::test);
+    _settings = new QSettings("Neimheadh", "VMGB", this);
+
+    QWidget *content = this->findChild<QWidget *>("content");
+    _contentLayout = new QVBoxLayout(this);
+    _contentLayout->setMargin(0);
+    content->setLayout(_contentLayout);
+
+    _guitarboard = new GuitarBoard(content, _settings);
+    _contentLayout->addWidget(_guitarboard);
+    _guitarboard->setObjectName("guitarboard");
+
     connect(this->findChild<QAction *>("actionQuit"), &QAction::triggered, this, &QApplication::quit);
+    connect(this->findChild<QAction *>("actionSettings"), &QAction::triggered, this, &MainWindow::openSettingWindow);
 }
 
 MainWindow::~MainWindow()
 {
+    delete _guitarboard;
+    delete _contentLayout;
     delete _ui;
+}
+
+void MainWindow::openSettingWindow()
+{
+    SettingWindow *settingWindow = new SettingWindow(_settings, this);
+
+    settingWindow->exec();
+    settingWindow->close();
+
+    delete settingWindow;
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
-    this->findChild<GuitarBoard *>("guitarboard")->resize();
+    _guitarboard->resize();
 }
 
-void MainWindow::test()
+void MainWindow::showEvent(QShowEvent *event)
 {
-    GuitarBoard *guitarboard = this->findChild<GuitarBoard *>("guitarboard");
-    unsigned char played[4] = {72, 45, 54, 60};
-
-    guitarboard->play(1, 0);
+    QMainWindow::showEvent(event);
+    _guitarboard->resize();
 }
 
 GuitarBoard *MainWindow::guitarboard()
 {
-    return this->findChild<GuitarBoard *>("guitarboard");
+    return this->_guitarboard;
 }

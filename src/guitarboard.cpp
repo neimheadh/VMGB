@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include "setting/guitarsetting.h"
+
 const unsigned char GuitarBoard::DEFAULT_TUNING[] = {40, 45, 50, 55, 59, 64};
 
 GuitarBoard::GuitarBoard(QWidget *parent, unsigned char frets, unsigned char strings, const unsigned char tuning[]) :
@@ -16,6 +18,24 @@ GuitarBoard::GuitarBoard(QWidget *parent, unsigned char frets, unsigned char str
     _frets = frets;
 
     _setTuning(strings, tuning == nullptr ? GuitarBoard::DEFAULT_TUNING : tuning);
+    _build();
+}
+
+GuitarBoard::GuitarBoard(QSettings *settings) :
+    QWidget(),
+    _ui(new Ui::GuitarBoard)
+{
+    _ui->setupUi(this);
+    _loadSettings(settings);
+    _build();
+}
+
+GuitarBoard::GuitarBoard(QWidget *parent, QSettings *settings):
+    QWidget(parent),
+    _ui(new Ui::GuitarBoard)
+{
+    _ui->setupUi(this);
+    _loadSettings(settings);
     _build();
 }
 
@@ -230,6 +250,26 @@ GuitarBoard *GuitarBoard::_build()
     resize();
 
     return this;
+}
+
+void GuitarBoard::_loadSettings(QSettings *settings)
+{
+    unsigned char strings;
+    unsigned char *tuning;
+
+    settings->beginGroup(GuitarSetting::SETTINGS_GROUP);
+    _frets = settings->value("frets", QString::number(GuitarBoard::DEFAULT_FRETS)).toString().toUInt();
+    strings = settings->value("strings", QString::number(GuitarBoard::DEFAULT_STRINGS)).toString().toUInt();
+    tuning = GuitarSetting::settingToTuning(
+                settings->value(
+                    "tuning",
+                    GuitarSetting::tuningToSetting(GuitarBoard::DEFAULT_STRINGS, GuitarBoard::DEFAULT_TUNING)
+               ).toString()
+            );
+    settings->endGroup();
+
+    _setTuning(strings, tuning);
+    delete[] tuning;
 }
 
 GuitarBoard *GuitarBoard::_setTuning(unsigned char strings, const unsigned char tuning[])

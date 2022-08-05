@@ -2,6 +2,7 @@
 #define GUITARBOARD_H
 
 #include <QFrame>
+#include <QSettings>
 #include <QWidget>
 #include "guitarstring.h"
 
@@ -16,6 +17,14 @@ class GuitarBoard : public QWidget
 
 public:
     /**
+     * @brief Default frets count.
+     */
+    static const unsigned char DEFAULT_FRETS = 24;
+    /**
+     * @brief Default string count.
+     */
+    static const unsigned char DEFAULT_STRINGS = 6;
+    /**
      * @brief Guitar board default tuning.
      */
     static const unsigned char DEFAULT_TUNING[];
@@ -29,9 +38,25 @@ public:
      */
     explicit GuitarBoard(
             QWidget *parent = nullptr,
-            unsigned char frets = 24,
-            unsigned char strings = 6,
+            unsigned char frets = DEFAULT_FRETS,
+            unsigned char strings = DEFAULT_STRINGS,
             const unsigned char tuning[] = nullptr
+    );
+    /**
+     * @brief GuitarBoard constructor.
+     * @param settings VMGB application settings.
+     */
+    explicit GuitarBoard(
+            QSettings *settings
+    );
+    /**
+     * @brief GuitarBoard
+     * @param parent   Parent ui.
+     * @param settings VMGB application settings.
+     */
+    explicit GuitarBoard(
+            QWidget *parent,
+            QSettings *settings
     );
     ~GuitarBoard();
 
@@ -171,6 +196,12 @@ private:
      * @return this
      */
     GuitarBoard *_build();
+
+    /**
+     * @brief Load application settings.
+     * @param settings Application settings.
+     */
+    void _loadSettings(QSettings *settings);
 
     /**
      * @brief Set the guitar tuning.

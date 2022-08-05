@@ -16,7 +16,7 @@
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>
-  <widget class="GuitarBoard" name="guitarboard"/>
+  <widget class="QWidget" name="content"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -33,16 +33,16 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionTest"/>
+    <addaction name="actionSettings"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionTest">
+  <action name="actionSettings">
    <property name="text">
-    <string>Test</string>
+    <string>Settings</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -54,14 +54,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>GuitarBoard</class>
-   <extends>QWidget</extends>
-   <header location="global">guitarboard.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

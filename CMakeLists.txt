@@ -29,11 +29,15 @@ file(GLOB UI_FILES
 file(GLOB TS_FILES
     i18n/*
 )
+
+set(CMAKE_AUTOUIC_SEARCH_PATHS
+    ${CMAKE_SOURCE_DIR}/ui
+    ${CMAKE_SOURCE_DIR}/ui/setting
+)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
-set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/ui)
 
 qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-message(STATUS ${QM_FILES})
+message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(${PROJECT_NAME}
     ${HEADER_FILES}
@@ -46,6 +50,7 @@ add_executable(${PROJECT_NAME}
 )
 include_directories(
     ${ALSA_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/ui
 )
