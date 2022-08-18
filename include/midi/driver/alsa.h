@@ -1,18 +1,21 @@
-#ifndef ALSAMIDIDRIVER_H
-#define ALSAMIDIDRIVER_H
+#ifndef MIDI_DRIVER_ALSA_H
+#define MIDI_DRIVER_ALSA_H
 
 #include <alsa/asoundlib.h>
-#include "mididriver.h"
+#include "midi/_driver.h"
 
-class AlsaMidiDriver : public MidiDriver
+namespace MIDI {
+namespace Driver {
+
+class Alsa : public _Driver
 {
 public:
     static constexpr char CLIENT_NAME[] = "VMGB";
     static constexpr char INPUT_PORT_SUFFIX[] = "_In";
     static constexpr char OUTPUT_PORT_SUFFIX[] = "_Out";
 
-    AlsaMidiDriver(Midi *manager);
-    ~AlsaMidiDriver();
+    Alsa(Manager *manager);
+    ~Alsa();
 
     /**
      * @inherits
@@ -43,4 +46,7 @@ private:
     char *_out_port_name;
 };
 
-#endif // ALSAMIDIDRIVER_H
+}
+}
+
+#endif // MIDI_DRIVER_ALSA_H

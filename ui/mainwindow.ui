@@ -30,6 +30,9 @@
     <property name="locale">
      <locale language="English" country="UnitedStates"/>
     </property>
+    <property name="tearOffEnabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>File</string>
     </property>
@@ -43,6 +46,9 @@
   <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
+   </property>
+   <property name="shortcut">
+    <string/>
    </property>
   </action>
   <action name="actionQuit">

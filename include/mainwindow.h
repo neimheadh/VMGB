@@ -4,7 +4,8 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QVBoxLayout>
-#include "guitarboard.h"
+#include "eventmanager.h"
+#include "guitar/board.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,18 +16,19 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(EventManager *eventManager = nullptr, QWidget *parent = nullptr);
     ~MainWindow();
 
-    void openSettingWindow();
+    void openSettingsWindow();
     void resizeEvent(QResizeEvent *event);
     void showEvent(QShowEvent *event);
 
-    GuitarBoard *guitarboard();
+    Guitar::Board *guitarboard();
 
 private:
     QVBoxLayout *_contentLayout;
-    GuitarBoard *_guitarboard;
+    EventManager *_eventManager;
+    Guitar::Board *_guitarboard;
     Ui::MainWindow *_ui;
     QSettings *_settings;
 };

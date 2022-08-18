@@ -18,10 +18,12 @@ file(GLOB SOURCE_FILES
     main.cpp
     src/*.cpp
     src/*/*.cpp
+    src/*/*/*.cpp
 )
 file(GLOB HEADER_FILES
     include/*.h
     include/*/*.h
+    include/*/*/*.h
 )
 file(GLOB UI_FILES
     ui/*.ui

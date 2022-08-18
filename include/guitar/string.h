@@ -5,27 +5,30 @@
 #include <QLabel>
 #include <vector>
 
-#include "keynote.h"
+#include "eventmanager.h"
+#include "guitar/fret.h"
 
 namespace Ui { class GuitarString; }
 
+namespace Guitar {
 
 /**
  * @brief A guitar string
  */
-class GuitarString : public QWidget
+class String : public QWidget
 {
     Q_OBJECT
 
 public:
     /**
      * @brief GuitarString constructor.
-     * @param parent Parent ui.
+     * @param em     Event manager.
      * @param frets  Guitar board fret count.
      * @param note   String base MIDI note.
+     * @param parent Parent ui.
      */
-    explicit GuitarString(QWidget *parent = nullptr, unsigned char frets = 24, unsigned char note = 0);
-    ~GuitarString();
+    explicit String(unsigned char frets = 24, unsigned char note = 0, EventManager *em = nullptr, QWidget *parent = nullptr);
+    ~String();
 
     /**
      * @brief Get the guitar board fret number.
@@ -52,47 +55,41 @@ public:
     /**
      * @brief Play a fret.
      * @param fret Fret number.
-     * @return this
      */
-    GuitarString *play(unsigned char fret);
+    void play(unsigned char fret);
     /**
      * @brief Play a MIDI note.
      * @param note The MIDI note.
-     * @return this
      */
-    GuitarString *playMidi(unsigned char note);
+    void playMidi(unsigned char note);
     /**
      * @brief Release the playing note.
-     * @return this
      */
-    GuitarString *release();
+    void release();
 
     /**
      * @brief Get a key note.
      * @param key The key number.
      * @return A key note.
      */
-    KeyNote *key(QString key);
+    Fret *fret(QString fret);
     /**
      * @brief Get a key note.
      * @param key The key number.
      * @return A key note.
      */
-    KeyNote *key(unsigned char key);
+    Fret *fret(unsigned char fret);
     /**
      * @brief Get string label.
      * @return The string QLabel.
      */
     QLabel *label();
 
-    /**
-     * @brief Add note change handler.
-     * @param handler The handler.
-     * @param args Handler additionnal args.
-     */
-    void onNoteChange(note_handler_t handler, void *args...);
-
 private:
+    /**
+     * @brief Event manager.
+     */
+    EventManager *_em;
     /**
      * @brief Guitar board fret count.
      */
@@ -112,14 +109,15 @@ private:
 
     /**
      * @brief Build the guitar string ui.
-     * @return this
      */
-    GuitarString *_build();
+    void _build();
     /**
      * @brief Release the given fret note.
      * @param fret A fret number.
      */
     void _release(unsigned char fret);
 };
+
+}
 
 #endif // GUITARSTRING_H

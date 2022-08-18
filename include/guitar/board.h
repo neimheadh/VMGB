@@ -4,61 +4,30 @@
 #include <QFrame>
 #include <QSettings>
 #include <QWidget>
-#include "guitarstring.h"
+#include "eventmanager.h"
+#include "guitar/string.h"
 
 namespace Ui { class GuitarBoard; }
 
+namespace Guitar {
 /**
  * @brief The guitar board.
  */
-class GuitarBoard : public QWidget
+class Board : public QWidget
 {
     Q_OBJECT
 
 public:
     /**
-     * @brief Default frets count.
-     */
-    static const unsigned char DEFAULT_FRETS = 24;
-    /**
-     * @brief Default string count.
-     */
-    static const unsigned char DEFAULT_STRINGS = 6;
-    /**
-     * @brief Guitar board default tuning.
-     */
-    static const unsigned char DEFAULT_TUNING[];
-
-    /**
-     * @brief GuitarBoard constructor.
-     * @param parent  Parent ui.
-     * @param frets   Number of guitarboard frets.
-     * @param strings Number of guitar strings.
-     * @param tuning  Guitar tuning.
-     */
-    explicit GuitarBoard(
-            QWidget *parent = nullptr,
-            unsigned char frets = DEFAULT_FRETS,
-            unsigned char strings = DEFAULT_STRINGS,
-            const unsigned char tuning[] = nullptr
-    );
-    /**
      * @brief GuitarBoard constructor.
      * @param settings VMGB application settings.
      */
-    explicit GuitarBoard(
-            QSettings *settings
+    explicit Board(
+            QSettings *settings,
+            EventManager *eventManager = nullptr,
+            QWidget *parent = nullptr
     );
-    /**
-     * @brief GuitarBoard
-     * @param parent   Parent ui.
-     * @param settings VMGB application settings.
-     */
-    explicit GuitarBoard(
-            QWidget *parent,
-            QSettings *settings
-    );
-    ~GuitarBoard();
+    ~Board();
 
     /**
      * @brief Get number of guitarboard frets.
@@ -77,6 +46,10 @@ public:
     const unsigned char *tuning();
 
     /**
+     * @brief Build the guitar board.
+     */
+    void build();
+    /**
      * @brief Get if the guitar board can play the given MIDI note.
      * @param note The MIDI note.
      * @return True if the board can play the given note.
@@ -86,58 +59,49 @@ public:
      * @brief Play a fret on a string.
      * @param string The string number.
      * @param fret   The fret number.
-     * @return this
      */
-    GuitarBoard *play(unsigned char string, unsigned char fret);
+    void play(unsigned char string, unsigned char fret);
     /**
      * @brief Play a chord.
      * @param chord  The chord. You should put a negative value to silent a note.
      * @param length The number of notes in the chord, including the silent notes.
-     * @return this
      */
-    GuitarBoard *play(int chord[], unsigned char length);
+    void play(int chord[], unsigned char length);
     /**
      * @brief Play a MIDI note.
      * @param note The MIDI note.
-     * @return this
      */
-    GuitarBoard *playMidi(unsigned char note);
+    void playMidi(unsigned char note);
     /**
      * @brief Play an ensemble of MIDI notes.
      * @param notes  MIDI notes.
      * @param length The played MIDI notes count.
-     * @return
      */
-    GuitarBoard *playMidi(const unsigned char notes[], unsigned char length);
+    void playMidi(const unsigned char notes[], unsigned char length);
     /**
      * @brief Release all playing notes.
-     * @return this
      */
-    GuitarBoard *release();
+    void release();
     /**
      * @brief Release note played on a string.
      * @param string The string number.
-     * @return this
      */
-    GuitarBoard *release(unsigned char string);
+    void release(unsigned char string);
     /**
      * @brief Release notes on severals strings.
      * @param strings The string list.
      * @param length  The string count.
-     * @return this
      */
-    GuitarBoard *release(int strings[], unsigned char length);
+    void release(int strings[], unsigned char length);
     /**
      * @brief Release a previously played midi note.
      * @param note The note.
-     * @return
      */
-    GuitarBoard *releaseMidi(unsigned char note);
+    void releaseMidi(unsigned char note);
     /**
      * @brief Resize the board.
-     * @return this
      */
-    GuitarBoard *resize();
+    void resize();
 
     /**
      * @brief Get dots frame.
@@ -149,13 +113,13 @@ public:
      * @param string The string number
      * @return A string.
      */
-    GuitarString *string(QString string);
+    String *string(QString string);
     /**
      * @brief Get a string.
      * @param string The string number
      * @return A string.
      */
-    GuitarString *string(unsigned char string);
+    String *string(unsigned char string);
     /**
      * @brief Get strings frame.
      * @return String frame.
@@ -163,17 +127,28 @@ public:
     QFrame *stringFrame();
 
     /**
-     * @brief Add note change handler.
-     * @param handler The handler.
-     * @param args Handler additionnal args.
+     * @inherits
      */
-    void onNoteChange(note_handler_t handler, void *args...);
+    void showEvent(QShowEvent *event);
 
 private:
+    /**
+     * @brief Event manager.
+     */
+    EventManager *_eventManager;
     /**
      * @brief The guitar board ui.
      */
     Ui::GuitarBoard *_ui;
+    /**
+     * @brief Application settings.
+     */
+    QSettings *_settings;
+
+    /**
+     * @brief Board dots widgets.
+     */
+    QLabel **_dot_widgets = nullptr;
     /**
      * @brief The guitar board frets count.
      */
@@ -183,6 +158,10 @@ private:
      */
     int *_midi_strings = nullptr;
     /**
+     * @brief List of string widgets.
+     */
+    String **_string_widgets = nullptr;
+    /**
      * @brief The guitar string count.
      */
     unsigned char _strings;
@@ -191,12 +170,13 @@ private:
      */
     unsigned char *_tuning = nullptr;
 
-    /**
-     * @brief Build the guitar board.
-     * @return this
-     */
-    GuitarBoard *_build();
+    unsigned int _eh_midi = 0;
+    unsigned int _eh_setting = 0;
 
+    /**
+     * @brief Clean the guitar board.
+     */
+    void _clear();
     /**
      * @brief Load application settings.
      * @param settings Application settings.
@@ -207,9 +187,10 @@ private:
      * @brief Set the guitar tuning.
      * @param strings The number of guitar string.
      * @param tuning  The tuning.
-     * @return this
      */
-    GuitarBoard *_setTuning(unsigned char strings, const unsigned char tuning[]);
+    void _setTuning(unsigned char strings, const unsigned char tuning[]);
 };
+
+}
 
 #endif // GUITARBOARD_H

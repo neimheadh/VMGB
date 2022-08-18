@@ -1,11 +1,13 @@
 #ifndef MIDIDRIVER_H
 #define MIDIDRIVER_H
 
-class Midi;
+namespace MIDI {
 
-class MidiDriver {
+class Manager;
+
+class _Driver {
 public:
-    MidiDriver(Midi *manager);
+    _Driver(Manager *manager);
 
     /**
      * @brief Free the MIDI driver.
@@ -35,7 +37,9 @@ public:
     virtual void process() = 0;
 
 protected:
-    Midi *_manager;
+    Manager *_manager;
 };
+
+}
 
 #endif // MIDIDRIVER_H

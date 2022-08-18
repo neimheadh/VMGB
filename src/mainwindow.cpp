@@ -3,13 +3,15 @@
 
 #include <QAction>
 #include <iostream>
-#include "settingwindow.h"
+#include "settingswindow.h"
 
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(EventManager *eventManager, QWidget *parent)
     : QMainWindow(parent)
     , _ui(new Ui::MainWindow)
 {
+    _eventManager = eventManager;
+
     _ui->setupUi(this);
 
     _settings = new QSettings("Neimheadh", "VMGB", this);
@@ -19,12 +21,12 @@ MainWindow::MainWindow(QWidget *parent)
     _contentLayout->setMargin(0);
     content->setLayout(_contentLayout);
 
-    _guitarboard = new GuitarBoard(content, _settings);
+    _guitarboard = new Guitar::Board(_settings, _eventManager);
     _contentLayout->addWidget(_guitarboard);
     _guitarboard->setObjectName("guitarboard");
 
     connect(this->findChild<QAction *>("actionQuit"), &QAction::triggered, this, &QApplication::quit);
-    connect(this->findChild<QAction *>("actionSettings"), &QAction::triggered, this, &MainWindow::openSettingWindow);
+    connect(this->findChild<QAction *>("actionSettings"), &QAction::triggered, this, &MainWindow::openSettingsWindow);
 }
 
 MainWindow::~MainWindow()
@@ -34,14 +36,14 @@ MainWindow::~MainWindow()
     delete _ui;
 }
 
-void MainWindow::openSettingWindow()
+void MainWindow::openSettingsWindow()
 {
-    SettingWindow *settingWindow = new SettingWindow(_settings, this);
+    SettingsWindow *settingsWindow = new SettingsWindow(_settings, _guitarboard, _eventManager);
 
-    settingWindow->exec();
-    settingWindow->close();
+    settingsWindow->exec();
+    settingsWindow->close();
 
-    delete settingWindow;
+    delete settingsWindow;
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
@@ -56,7 +58,7 @@ void MainWindow::showEvent(QShowEvent *event)
     _guitarboard->resize();
 }
 
-GuitarBoard *MainWindow::guitarboard()
+Guitar::Board *MainWindow::guitarboard()
 {
     return this->_guitarboard;
 }

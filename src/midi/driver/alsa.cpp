@@ -1,10 +1,12 @@
-#include "mididriver/alsamididriver.h"
+#include "midi/driver/alsa.h"
 
 #include <iostream>
 #include <string.h>
-#include "midi.h"
+#include "midi/manager.h"
 
-AlsaMidiDriver::AlsaMidiDriver(Midi *manager): MidiDriver(manager)
+using namespace MIDI::Driver;
+
+Alsa::Alsa(Manager *manager): _Driver(manager)
 {
     size_t size = strlen(CLIENT_NAME) + strlen(INPUT_PORT_SUFFIX);
     _in_port_name = new char[size + 1];
@@ -17,12 +19,12 @@ AlsaMidiDriver::AlsaMidiDriver(Midi *manager): MidiDriver(manager)
     strcat(_out_port_name, OUTPUT_PORT_SUFFIX);
 }
 
-AlsaMidiDriver::~AlsaMidiDriver()
+Alsa::~Alsa()
 {
-    AlsaMidiDriver::free();
+    Alsa::free();
 }
 
-void AlsaMidiDriver::free()
+void Alsa::free()
 {
     if (_handle != nullptr) {
         snd_seq_close(_handle);
@@ -36,7 +38,7 @@ void AlsaMidiDriver::free()
     delete[] _out_port_name;
 }
 
-void AlsaMidiDriver::init()
+void Alsa::init()
 {
     int err = snd_seq_open(&_handle,
                            "default",
@@ -56,7 +58,7 @@ void AlsaMidiDriver::init()
     }
 }
 
-void AlsaMidiDriver::noteOff(unsigned char note, unsigned char channel)
+void Alsa::noteOff(unsigned char note, unsigned char channel)
 {
     if (_handle != nullptr) {
         snd_seq_event_t ev;
@@ -76,7 +78,7 @@ void AlsaMidiDriver::noteOff(unsigned char note, unsigned char channel)
     }
 }
 
-void AlsaMidiDriver::noteOn(unsigned char note, unsigned char channel)
+void Alsa::noteOn(unsigned char note, unsigned char channel)
 {
     if (_handle != nullptr) {
         snd_seq_event_t ev;
@@ -96,7 +98,7 @@ void AlsaMidiDriver::noteOn(unsigned char note, unsigned char channel)
     }
 }
 
-void AlsaMidiDriver::process()
+void Alsa::process()
 {
     snd_seq_event_t *ev;
 
@@ -106,18 +108,18 @@ void AlsaMidiDriver::process()
             case SND_SEQ_EVENT_CONTROLLER:
                 break;
             case SND_SEQ_EVENT_NOTEOFF:
-                _manager->followEvent({
-                                    .type = MidiEventType::NOTE_OFF,
-                                    .channel = ev->data.note.channel,
-                                    .value = ev->data.note.note
-                                });
+                _manager->inputEvent({
+                                         .type = MidiEventType::NOTE_OFF,
+                                         .channel = ev->data.note.channel,
+                                         .value = ev->data.note.note
+                                     });
                 break;
             case SND_SEQ_EVENT_NOTEON:
-                _manager->followEvent({
-                                    .type = MidiEventType::NOTE_ON,
-                                    .channel = ev->data.note.channel,
-                                    .value = ev->data.note.note
-                                });
+                _manager->inputEvent({
+                                         .type = MidiEventType::NOTE_ON,
+                                         .channel = ev->data.note.channel,
+                                         .value = ev->data.note.note
+                                     });
                 break;
             case SND_SEQ_EVENT_PITCHBEND:
                 break;
