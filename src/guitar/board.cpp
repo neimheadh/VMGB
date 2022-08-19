@@ -7,6 +7,7 @@
 
 #include "midi/midi.h"
 #include "setting/guitar.h"
+#include "setting/setting.h"
 
 using namespace Guitar;
 
@@ -50,7 +51,7 @@ Board::~Board()
         }
 
         if (_eh_setting > 0) {
-            _eventManager->unsubscribe(Setting::Guitar::EVENT_SAVE, _eh_setting);
+            _eventManager->unsubscribe(Setting::EVENT_SAVE_GUITAR, _eh_setting);
             _eh_setting = 0;
         }
     }
@@ -235,7 +236,7 @@ void Board::showEvent(QShowEvent *event)
 
     if (_eventManager != nullptr) {
         _eh_midi = _eventManager->subscribe(MIDI::EVENT_MIDI_INPUT, (event_handler_t *) &_on_midi_input, this);
-        _eh_setting = _eventManager->subscribe(Setting::Guitar::EVENT_SAVE, (event_handler_t *) &_on_setting_save, this);
+        _eh_setting = _eventManager->subscribe(Setting::EVENT_SAVE_GUITAR, (event_handler_t *) &_on_setting_save, this);
     }
 }
 

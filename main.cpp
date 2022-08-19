@@ -2,12 +2,12 @@
 #include <thread>
 #include <QApplication>
 #include <QLocale>
+#include <QSettings>
 #include <QTranslator>
 
 #include "eventmanager.h"
 #include "mainwindow.h"
 #include "midi/manager.h"
-#include "guitar/board.h"
 
 int main(int argc, char *argv[])
 {
@@ -24,9 +24,10 @@ int main(int argc, char *argv[])
         }
     }
 
+    QSettings settings("Neimheadh", "VMGB");
     EventManager eventManager;
-    MIDI::Manager mid(&eventManager);
-    MainWindow w(&eventManager);
+    MIDI::Manager mid(&settings, &eventManager);
+    MainWindow w(&settings, &eventManager);
 
     mid.start();
     w.show();

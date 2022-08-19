@@ -29,6 +29,9 @@ public:
     void setValue(unsigned char note);
     unsigned char value();
 
+signals:
+    void valueChanged(MidiNoteInput *input, unsigned char newValue);
+
 private slots:
     void on_increase_clicked();
 

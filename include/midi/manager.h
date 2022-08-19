@@ -1,13 +1,14 @@
 #ifndef MIDI_MANAGER_H
 #define MIDI_MANAGER_H
 
+#include <QSettings>
 #include <alsa/asoundlib.h>
 #include <functional>
 #include <thread>
 #include <vector>
 
 #include "eventmanager.h"
-#include "midi/_driver.h"
+#include "midi/driver/abstractdriver.h"
 #include "midi/midi.h"
 
 namespace MIDI {
@@ -15,37 +16,34 @@ namespace MIDI {
 class Manager
 {
     public:
-        Manager(_Driver *driver = nullptr, EventManager *eventManager = nullptr);
-        Manager(EventManager *eventManager);
+        Manager(QSettings *settings, EventManager *eventManager);
         ~Manager();
 
         /**
          * @brief Start the MIDI listening thread.
          */
         void start();
-
         /**
          * @brief Stop & free the MIDI listening thread.
          */
         void end();
 
         /**
-         * @brief Handle a MIDI input event.
+         * @brief Recieve a midi event.
          * @param event The event.
          */
-        void inputEvent(struct MidiEvent event);
-
+        void recieve(struct MidiEvent event);
         /**
          * @brief Send a midi event.
          * @param event The event.
          */
-        void send(const struct MidiEvent *event);
+        void send(struct MidiEvent event);
 
     private:
-        _Driver *_driver;
-        const _Driver *__driver;
-        EventManager *_eventManager;
-        std::thread *_thread;
+        MIDI::Driver::AbstractDriver *_driver = nullptr;
+        EventManager *_eventManager = nullptr;
+        QSettings *_settings = nullptr;
+        std::thread *_thread = nullptr;
 
         unsigned int _midi_send_evt_h = 0;
 

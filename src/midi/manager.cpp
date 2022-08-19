@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <QString>
+#include "setting/driver.h"
 #include "midi/driver/alsa.h"
 
 using namespace MIDI;
@@ -9,41 +10,27 @@ using namespace MIDI::Driver;
 
 void _on_midi_send(Manager *manager, const struct MidiEvent *event)
 {
-    manager->send(event);
+    manager->send(*event);
 }
 
-Manager::Manager(_Driver *driver, EventManager *eventManager)
+Manager::Manager(QSettings *settings, EventManager *eventManager)
 {
-    __driver = driver;
-
-    if (driver == nullptr) {
-        _driver = new Alsa(this);
-    } else {
-        _driver = driver;
-    }
+    _driver = nullptr;
 
     _eventManager = eventManager;
-}
-
-Manager::Manager(EventManager *eventManager)
-{
-    __driver = nullptr;
-    _driver = new Alsa(this);
-    _eventManager = eventManager;
+    _settings = settings;
 }
 
 Manager::~Manager()
 {
     end();
-
-    if (__driver == nullptr && _driver != nullptr) {
-        delete (Alsa *) _driver;
-        _driver = nullptr;
-    }
 }
 
 void Manager::start()
-{
+{   
+    // @todo Only ALSA for the moment, see settings in future.
+    _driver = new Alsa(this, Setting::Driver::name(_settings).toStdString().data());
+
     if (_thread == nullptr) {
         _thread = new std::thread(&Manager::_process, this);
     }
@@ -62,26 +49,19 @@ void Manager::end()
     }
 }
 
-void Manager::inputEvent(struct MidiEvent event)
+void Manager::recieve(struct MidiEvent event)
 {
-    if (_eventManager != nullptr) {
+    if (_eventManager) {
         _eventManager->dispatch(EVENT_MIDI_INPUT, &event);
     }
 }
 
-void Manager::send(const struct MidiEvent *event)
+void Manager::send(struct MidiEvent event)
 {
-    switch (event->type) {
-    case MidiEventType::NOTE_OFF:
-        _driver->noteOff(event->value, event->channel);
-        break;
-    case MidiEventType::NOTE_ON:
-        _driver->noteOn(event->value, event->channel);
-        break;
-    }
+    _driver->send(event);
 
     if (_eventManager) {
-        _eventManager->dispatch(EVENT_MIDI_OUTPUT, (void *) event);
+        _eventManager->dispatch(EVENT_MIDI_OUTPUT, &event);
     }
 }
 

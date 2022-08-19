@@ -6,7 +6,7 @@
 #include "settingswindow.h"
 
 
-MainWindow::MainWindow(EventManager *eventManager, QWidget *parent)
+MainWindow::MainWindow(QSettings *settings, EventManager *eventManager, QWidget *parent)
     : QMainWindow(parent)
     , _ui(new Ui::MainWindow)
 {
@@ -14,7 +14,7 @@ MainWindow::MainWindow(EventManager *eventManager, QWidget *parent)
 
     _ui->setupUi(this);
 
-    _settings = new QSettings("Neimheadh", "VMGB", this);
+    _settings = settings;
 
     QWidget *content = this->findChild<QWidget *>("content");
     _contentLayout = new QVBoxLayout(this);

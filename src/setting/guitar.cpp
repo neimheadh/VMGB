@@ -1,20 +1,17 @@
 #include "setting/guitar.h"
 #include "ui_setting_guitar.h"
 
+#include <QAction>
 #include <QFormLayout>
 #include <QLineEdit>
 #include <string.h>
 #include "midi/midi.h"
+#include "setting/setting.h"
 
 using namespace MIDI;
 using namespace Setting;
 
 const unsigned char Guitar::DEFAULT_TUNING[] = {40, 45, 50, 55, 59, 64};
-const char Guitar::EVENT_SAVE[] = "Setting::Guitar::EVENT_SAVE";
-const char Guitar::SETTING_FRETS[] = "frets";
-const char Guitar::SETTING_STRINGS[] = "strings";
-const char Guitar::SETTING_TUNING[] = "tuning";
-const char Guitar::SETTINGS_GROUP[] = "guitar";
 
 Guitar::Guitar(QSettings *settings, EventManager *eventManager, QWidget *parent) :
     QWidget(parent),
@@ -78,14 +75,14 @@ QString Guitar::tuningToSetting(unsigned char strings, const unsigned char *tuni
 void Guitar::save()
 {
     if (_changed) {
-        _settings->beginGroup(Guitar::SETTINGS_GROUP);
-        _settings->setValue(SETTING_FRETS, QString::number(_frets));
-        _settings->setValue(SETTING_STRINGS, QString::number(_strings));
-        _settings->setValue(SETTING_TUNING, tuningToSetting(_strings, _tuning));
+        _settings->beginGroup(SETTING_GROUP_GUITAR);
+        _settings->setValue(SETTING_GUITAR_FRETS, QString::number(_frets));
+        _settings->setValue(SETTING_GUITAR_STRINGS, QString::number(_strings));
+        _settings->setValue(SETTING_GUITAR_TUNING, tuningToSetting(_strings, _tuning));
         _settings->endGroup();
 
         if (_eventManager != nullptr) {
-            _eventManager->dispatch(EVENT_SAVE, (void *) _settings);
+            _eventManager->dispatch(EVENT_SAVE_GUITAR, (void *) _settings);
         }
     }
 }
@@ -99,8 +96,8 @@ unsigned char Guitar::frets(QSettings *settings)
 {
     unsigned char frets;
 
-    settings->beginGroup(SETTINGS_GROUP);
-    frets = settings->value(SETTING_FRETS, QString::number(DEFAULT_FRETS)).toString().toUInt();
+    settings->beginGroup(SETTING_GROUP_GUITAR);
+    frets = settings->value(SETTING_GUITAR_FRETS, QString::number(DEFAULT_FRETS)).toString().toUInt();
     settings->endGroup();
 
     return frets;
@@ -115,8 +112,8 @@ unsigned char Guitar::strings(QSettings *settings)
 {
     unsigned char strings;
 
-    settings->beginGroup(SETTINGS_GROUP);
-    strings = settings->value(SETTING_STRINGS, QString::number(DEFAULT_STRINGS)).toString().toUInt();
+    settings->beginGroup(SETTING_GROUP_GUITAR);
+    strings = settings->value(SETTING_GUITAR_STRINGS, QString::number(DEFAULT_STRINGS)).toString().toUInt();
     settings->endGroup();
 
     return strings;
@@ -131,8 +128,8 @@ unsigned char *Guitar::tuning(QSettings *settings)
 {
     unsigned char *tuning;
 
-    settings->beginGroup(SETTINGS_GROUP);
-    tuning = settingToTuning(settings->value(SETTING_TUNING, tuningToSetting(DEFAULT_STRINGS, DEFAULT_TUNING)));
+    settings->beginGroup(SETTING_GROUP_GUITAR);
+    tuning = settingToTuning(settings->value(SETTING_GUITAR_TUNING, tuningToSetting(DEFAULT_STRINGS, DEFAULT_TUNING)));
     settings->endGroup();
 
     return tuning;
@@ -187,7 +184,9 @@ void Guitar::_buildTuning()
     for (unsigned char i = 0; i < _strings; i++) {
         _tuningLabels[i] = new QLabel("String " + QString::number(i + 1));
         _tuningInputs[i] = new MidiNoteInput(_tuning[i]);
+        _tuningInputs[i]->setObjectName(QString::number(i));
 
+        connect(_tuningInputs[i], &MidiNoteInput::valueChanged, this, &Guitar::_tuningChange);
         layout->addRow(_tuningLabels[i], _tuningInputs[i]);
     }
 }
@@ -217,4 +216,14 @@ void Guitar::_loadSetting()
     _frets = frets(_settings);
     _strings = strings(_settings);
     _tuning = tuning(_settings);
+}
+
+void Guitar::_tuningChange(Setting::MidiNoteInput *input, unsigned char value)
+{
+    unsigned char string = input->objectName().toUInt();
+
+    if (string <= _strings) {
+        _tuning[string] = value;
+        _changed = true;
+    }
 }

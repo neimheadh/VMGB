@@ -31,26 +31,6 @@ namespace Setting {
          * @brief Default tuning.
          */
         static const unsigned char DEFAULT_TUNING[];
-        /**
-         * @brief Sended save event name.
-         */
-        static const char EVENT_SAVE[];
-        /**
-         * @brief Frets setting name.
-         */
-        static const char SETTING_FRETS[];
-        /**
-         * @brief Strings setting name.
-         */
-        static const char SETTING_STRINGS[];
-        /**
-         * @brief Tuning setting name.
-         */
-        static const char SETTING_TUNING[];
-        /**
-         * @brief Guitar application settings group.
-         */
-        static const char SETTINGS_GROUP[];
 
         static QString tuningToSetting(unsigned char strings, const unsigned char *tuning);
         static unsigned char *settingToTuning(QString setting);
@@ -72,6 +52,8 @@ namespace Setting {
     private slots:
         void on_frets_input_valueChanged(int frets);
         void on_strings_input_valueChanged(int strings);
+
+        void _tuningChange(Setting::MidiNoteInput *input, unsigned char value);
 
     private:
         EventManager *_eventManager;

@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(EventManager *eventManager = nullptr, QWidget *parent = nullptr);
+    MainWindow(QSettings *settings, EventManager *eventManager = nullptr, QWidget *parent = nullptr);
     ~MainWindow();
 
     void openSettingsWindow();

@@ -35,7 +35,7 @@ void SettingsWindow::_buildTabs()
 
     _cleanTabs();
 
-    _driverTab = new Setting::Driver();
+    _driverTab = new Setting::Driver(_settings, _eventManager);
     _guitarTab = new Setting::Guitar(_settings, _eventManager);
 
     tabs->addTab(_guitarTab, "Guitar");
@@ -64,5 +64,6 @@ void SettingsWindow::_cleanTabs()
 void SettingsWindow::on_SettingsWindow_accepted()
 {
     _guitarTab->save();
+    _driverTab->save();
 }
 

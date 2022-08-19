@@ -65,6 +65,7 @@ void MidiNoteInput::setValue(unsigned char value)
     }
     _value = value;
     input()->setText(MIDI_NOTE_MAP[_value]);
+    emit valueChanged(this, value);
 }
 
 unsigned char MidiNoteInput::value()
