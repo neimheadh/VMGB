@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "guitarboard.h"
+#include <QSettings>
+#include <QVBoxLayout>
+#include "eventmanager.h"
+#include "guitar/board.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -13,14 +16,20 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QSettings *settings, EventManager *eventManager = nullptr, QWidget *parent = nullptr);
     ~MainWindow();
-    void resizeEvent(QResizeEvent *event);
-    void test();
 
-    GuitarBoard *guitarboard();
+    void openSettingsWindow();
+    void resizeEvent(QResizeEvent *event);
+    void showEvent(QShowEvent *event);
+
+    Guitar::Board *guitarboard();
 
 private:
+    QVBoxLayout *_contentLayout;
+    EventManager *_eventManager;
+    Guitar::Board *_guitarboard;
     Ui::MainWindow *_ui;
+    QSettings *_settings;
 };
 #endif // MAINWINDOW_H

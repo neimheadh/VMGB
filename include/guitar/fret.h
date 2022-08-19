@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QPushButton>
 
+#include "eventmanager.h"
+
 struct NoteChangeEvent {
     unsigned char note;
     bool released;
@@ -13,33 +15,30 @@ struct NoteChangeEvent {
 typedef void (*note_handler_t)(struct NoteChangeEvent, ...);
 
 namespace Ui {
-class KeyNote;
+class GuitarFret;
 }
+
+namespace Guitar {
 
 /**
  * @brief A note on the guitar board.
  */
-class KeyNote : public QWidget
+class Fret : public QWidget
 {
     Q_OBJECT
 
 public:
-    /**
-     * @brief The map between MIDI notes number & name.
-     */
-    static const char* MIDI_MAP[];
-    /**
-     * @brief The MIDI note maximum value.
-     */
-    static const char MIDI_MAX = 127;
+    static const char *EVENT_FRET_PRESS;
+    static const char *EVENT_FRET_RELEASE;
 
     /**
-     * @brief KeyNote constructor.
-     * @param parent Parent UI.
+     * @brief Fret constructor.
      * @param note The MIDI note number.
+     * @param eventManager Event manager.
+     * @param parent Parent UI.
      */
-    explicit KeyNote(QWidget *parent = nullptr, unsigned char note = 0);
-    ~KeyNote();
+    explicit Fret(unsigned char note, EventManager *eventManager = nullptr, QWidget *parent = nullptr);
+    ~Fret();
 
     /**
      * @brief Get the MIDI note number.
@@ -49,32 +48,22 @@ public:
 
     /**
      * @brief Play the note.
-     * @return this
      */
-    KeyNote *play();
+    void play();
     /**
      * @brief Release the note.
-     * @return this
      */
-    KeyNote *release();
+    void release();
     /**
      * @brief Set the note button to be displayed as the first string note.
-     * @return this
      */
-    KeyNote *setFirst();
+     void setFirst();
 
     /**
      * @brief Get the note button.
      * @return The note button.
      */
     QPushButton *button();
-
-    /**
-     * @brief Add note change handler.
-     * @param handler The handler.
-     * @param args Handler additionnal args.
-     */
-    void onNoteChange(note_handler_t handler, void *args...);
 
 private slots:
 
@@ -89,23 +78,19 @@ private:
     };
 
     /**
+     * @brief Event manager.
+     */
+    EventManager *_em;
+    /**
      * @brief The MIDI note.
      */
     unsigned char _note;
     /**
-     * @brief Subscribed note-press handlers.
-     */
-    std::vector<struct _note_handler_v> _note_handlers;
-    /**
      * @brief The note UI.
      */
-    Ui::KeyNote *_ui;
-
-    /**
-     * @brief Throw a note change event.
-     * @param event The event.
-     */
-    void _noteEvent(struct NoteChangeEvent event);
+    Ui::GuitarFret *_ui;
 };
+
+}
 
 #endif // NOTE_H
