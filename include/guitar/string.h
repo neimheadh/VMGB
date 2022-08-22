@@ -1,8 +1,9 @@
 #ifndef GUITARSTRING_H
 #define GUITARSTRING_H
 
-#include <QWidget>
 #include <QLabel>
+#include <QSettings>
+#include <QWidget>
 #include <vector>
 
 #include "eventmanager.h"
@@ -22,12 +23,19 @@ class String : public QWidget
 public:
     /**
      * @brief GuitarString constructor.
-     * @param em     Event manager.
-     * @param frets  Guitar board fret count.
-     * @param note   String base MIDI note.
-     * @param parent Parent ui.
+     * @param settings Application settings.
+     * @param em       Event manager.
+     * @param frets    Guitar board fret count.
+     * @param note     String base MIDI note.
+     * @param parent   Parent ui.
      */
-    explicit String(unsigned char frets = 24, unsigned char note = 0, EventManager *em = nullptr, QWidget *parent = nullptr);
+    explicit String(
+            QSettings *settings,
+            unsigned char frets = 24,
+            unsigned char note = 0,
+            EventManager *em = nullptr,
+            QWidget *parent = nullptr
+    );
     ~String();
 
     /**
@@ -102,6 +110,10 @@ private:
      * @brief The playing fret. -1 if none.
      */
     int _playing = -1;
+    /**
+     * @brief Application settings.
+     */
+    QSettings *_settings;
     /**
      * @brief Guitar string ui.
      */

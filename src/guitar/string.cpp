@@ -8,7 +8,7 @@
 using namespace MIDI;
 using namespace Guitar;
 
-String::String(unsigned char frets, unsigned char note, EventManager *em, QWidget *parent)
+String::String(QSettings *settings, unsigned char frets, unsigned char note, EventManager *em, QWidget *parent)
     : QWidget{parent},
       _ui(new Ui::GuitarString)
 {
@@ -17,6 +17,7 @@ String::String(unsigned char frets, unsigned char note, EventManager *em, QWidge
     _frets = frets;
     _em = em;
     _note = note > MIDI_NOTE_MAX ? MIDI_NOTE_MAX : note;
+    _settings = settings;
 
     _build();
 }
@@ -90,7 +91,7 @@ void String::_build()
     Fret *Fret = nullptr;
 
     for (unsigned int i = 0; i < _frets; i++) {
-        Fret = new Guitar::Fret(_note + i, _em, this);
+        Fret = new Guitar::Fret(_settings, _note + i, _em, this);
         Fret->setObjectName(QString::number(i));
 
         if (i == 0) {

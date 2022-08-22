@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <QWidget>
 #include <QPushButton>
+#include <QSettings>
 
 #include "eventmanager.h"
 
@@ -33,11 +34,17 @@ public:
 
     /**
      * @brief Fret constructor.
+     * @param settings Application settings.
      * @param note The MIDI note number.
      * @param eventManager Event manager.
      * @param parent Parent UI.
      */
-    explicit Fret(unsigned char note, EventManager *eventManager = nullptr, QWidget *parent = nullptr);
+    explicit Fret(
+            QSettings *settings,
+            unsigned char note,
+            EventManager *eventManager = nullptr,
+            QWidget *parent = nullptr
+    );
     ~Fret();
 
     /**
@@ -85,6 +92,10 @@ private:
      * @brief The MIDI note.
      */
     unsigned char _note;
+    /**
+     * @brief Application settings.
+     */
+    QSettings *_settings;
     /**
      * @brief The note UI.
      */

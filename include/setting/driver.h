@@ -4,6 +4,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QSettings>
+#include <QSpinBox>
 #include <QWidget>
 #include "eventmanager.h"
 
@@ -17,9 +18,11 @@ class Driver : public QWidget
     Q_OBJECT
 
 public:
+    static const unsigned char DEFAULT_CHANNEL = 0;
     static const char *DEFAULT_DRIVER;
     static const char *DEFAULT_NAME;
 
+    static unsigned char channel(QSettings *settings);
     static QString driver(QSettings *settings);
     static QString name(QSettings *settings);
 
@@ -42,6 +45,7 @@ private:
     bool _changed = false;
 
     QLineEdit *_applicationName();
+    QSpinBox *_channel();
     QComboBox *_drivers();
 };
 }
