@@ -84,7 +84,7 @@ void Board::build()
     _dot_widgets = new QLabel*[_frets * 3];
 
     for (int i = _strings - 1; i >= 0; i--) {
-        _string_widgets[i] = new String(_frets, _tuning[i], _eventManager, this);
+        _string_widgets[i] = new String(_settings, _frets, _tuning[i], _eventManager, this);
         _string_widgets[i]->setObjectName(QString::number(i));
         stringBoard->addWidget(_string_widgets[i]);
         _midi_strings[i] = -1;

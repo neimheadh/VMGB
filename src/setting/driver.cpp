@@ -35,6 +35,18 @@ void Driver::showEvent(QShowEvent *event)
 
     _applicationName()->setText(name(_settings));
     drivers->setCurrentText(driver(_settings));
+    _channel()->setValue(channel(_settings));
+}
+
+unsigned char Driver::channel(QSettings *settings)
+{
+    unsigned char channel;
+
+    settings->beginGroup(SETTING_GROUP_DRIVER);
+    channel = settings->value(SETTING_DRIVER_CHANNEL, QString::number(DEFAULT_CHANNEL)).toUInt();
+    settings->endGroup();
+
+    return channel;
 }
 
 QString Driver::driver(QSettings *settings)
@@ -63,6 +75,7 @@ void Driver::save()
 {
     if (_changed) {
         _settings->beginGroup(SETTING_GROUP_DRIVER);
+        _settings->setValue(SETTING_DRIVER_CHANNEL, _channel()->value());
         _settings->setValue(SETTING_DRIVER_DRIVER, _drivers()->currentText());
         _settings->setValue(SETTING_DRIVER_NAME, _applicationName()->text());
         _settings->endGroup();
@@ -78,6 +91,11 @@ void Driver::save()
 QLineEdit *Driver::_applicationName()
 {
     return findChild<QLineEdit *>("application_name");
+}
+
+QSpinBox *Driver::_channel()
+{
+    return findChild<QSpinBox *>("channel");
 }
 
 QComboBox *Driver::_drivers()

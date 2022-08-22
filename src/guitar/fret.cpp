@@ -4,6 +4,7 @@
 #include <iostream>
 #include <QTime>
 #include "midi/midi.h"
+#include "setting/driver.h"
 
 using namespace MIDI;
 using namespace Guitar;
@@ -12,14 +13,15 @@ using namespace Guitar;
 const char *Fret::EVENT_FRET_PRESS = "Guitar::Board::EVENT_FRET_PRESS";
 const char *Fret::EVENT_FRET_RELEASE = "Guitar::Board::EVENT_FRET_RELEASE";
 
-Fret::Fret(unsigned char note, EventManager *eventManager, QWidget *parent) :
+Fret::Fret(QSettings *settings, unsigned char note, EventManager *eventManager, QWidget *parent) :
     QWidget(parent),
     _ui(new Ui::GuitarFret)
 {
-    _ui->setupUi(this);
-
     _note = note > MIDI_NOTE_MAX ? MIDI_NOTE_MAX : note;
     _em = eventManager;
+    _settings = settings;
+
+    _ui->setupUi(this);
 
     button()->setText(MIDI_NOTE_MAP[note]);
 }
@@ -65,6 +67,7 @@ void Fret::on_button_pressed()
         _em->dispatch(EVENT_FRET_PRESS, &_note);
         event = {
             .type = MIDI::MidiEventType::NOTE_ON,
+            .channel = Setting::Driver::channel(_settings),
             .value = _note
         };
         _em->dispatch(MIDI::EVENT_MIDI_SEND, &event);

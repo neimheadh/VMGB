@@ -8,6 +8,7 @@ static const char *EVENT_SAVE_GUITAR = "Setting::EVENT_SAVE_GUITAR";
 static const char *SETTING_GROUP_DRIVER = "driver";
 static const char *SETTING_GROUP_GUITAR = "guitar";
 
+static const char *SETTING_DRIVER_CHANNEL = "channel";
 static const char *SETTING_DRIVER_DRIVER = "driver";
 static const char *SETTING_DRIVER_NAME = "name";
 
